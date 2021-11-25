@@ -1,0 +1,36 @@
+body{
+    padding: 2rem;
+    background-color: rgb(215, 230, 250);
+}
+.island{
+    max-width: 60%;
+    margin: 0 auto;
+    
+    background-color: white;
+    border-radius: 0.3rem;
+    color: #0d6efd;
+    
+}
+.island_item{
+    padding: 1rem; 
+
+    
+}
+.island_item:not(.checked){
+    order:-1
+}
+.island_item {
+    border-bottom: 2px solid rgb(215, 230, 250);
+  
+    margin-bottom: -1px;
+}
+/* .island_item + .island_item {
+    border-top: 2px solid rgb(215, 230, 250);
+} */
+.form-check-input:checked + label{
+    text-decoration: line-through;
+}
+.list{
+    display: flex;
+    flex-direction: column;
+}
