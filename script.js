@@ -1,0 +1,6 @@
+class TodoElement{
+    constructor (todo){
+        
+
+    }
+}
