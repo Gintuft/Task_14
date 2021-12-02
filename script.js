@@ -3,7 +3,7 @@ const listElement = document.querySelector('#list')
 const formCreateElement = document.querySelector('#formCreate')
 
 class TodoFormCreate {
-  
+
   constructor(formCreateElement) {
     this.formCreateElement = formCreateElement
     this.init()
@@ -45,12 +45,15 @@ class ListElement {
     this.init()
   }
   init() {
-    this.handleChange=this.handleChange.bind(this)
-    this.handleClickRemoveButton=this.handleClickRemoveButton.bind(this)
-    this.handleClickEditButton=this.handleClickEditButton.bind(this)
-    this.handleClickCancelEditButton=this.handleClickCancelEditButton.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+    this.handleClickRemoveButton = this.handleClickRemoveButton.bind(this)
+    this.handleClickEditButton = this.handleClickEditButton.bind(this)
+    this.handleClickCancelEditButton = this.handleClickCancelEditButton.bind(this)
     this.handleRenderNeed = this.handleRenderNeed.bind(this)
     this.handleFormEditSubmit = this.handleFormEditSubmit.bind(this)
+    this.handleBeforeUnload=this.handleBeforeUnload.bind(this)
+    this.handleDOMReady = this.handleDOMReady.bind(this)
+
 
     window.addEventListener('render:need', this.handleRenderNeed)
     this.listElement.addEventListener('change', this.handleChange)
@@ -58,128 +61,130 @@ class ListElement {
     this.listElement.addEventListener('click', this.handleClickEditButton)
     this.listElement.addEventListener('click', this.handleClickCancelEditButton)
     this.listElement.addEventListener('submit', this.handleFormEditSubmit)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+    window.addEventListener('DOMContentLoaded', this.handleDOMReady)
   }
-  
-  handleChange (event) {
+
+  handleChange(event) {
     const { target } = event
     const { id, checked, type } = target
-  
+
     if (type !== 'checkbox') return
-  
+
     console.log(target.dataset)
-  
+
     data.forEach((item) => {
       if (item.id == id) {
         item.isChecked = checked
       }
     })
-  
-    this.render()
-  }
-
-  
-handleChange (event) {
-  const { target } = event
-  const { id, checked, type } = target
-
-  if (type !== 'checkbox') return
-
-  console.log(target.dataset)
-
-  data.forEach((item) => {
-    if (item.id == id) {
-      item.isChecked = checked
-    }
-  })
-
-  this.render()
-}
-
-handleBeforeUnload () {
-  const json = JSON.stringify(data)
-  localStorage.setItem('data', json)
-}
-
-handleDOMReady () {
-  const dataFromStorage = localStorage.getItem('data')
-
-  if (dataFromStorage) {
-    data = JSON.parse(dataFromStorage)
 
     this.render()
   }
-}
 
-handleClickRemoveButton (event) {
-  
-  const role = event.target.getAttribute('data-role')
-  const id = event.target.getAttribute('data-id')
 
-  if (role == 'remove') {
-    data = data.filter((item) => {
-      
-      return item.id != id
-    })
+  handleChange(event) {
+    const { target } = event
+    const { id, checked, type } = target
 
-    this.render()
-  }
-}
+    if (type !== 'checkbox') return
 
-handleClickEditButton (event) {
-  const { target } = event
-  const { role, id } = target.dataset
-
-  if (role == 'edit') {
-    if (this.isEdit == true) {
-      alert('Уже редактируется')
-      return
-    }
+    console.log(target.dataset)
 
     data.forEach((item) => {
       if (item.id == id) {
-        this.currentEditedToDo = item
-        const { parentElement } = target
-        const formEditElement = this.formEditTemplate(item)
-
-        parentElement.outerHTML = formEditElement
-        this.isEdit = true
+        item.isChecked = checked
       }
     })
-  }
-}
-
-handleClickCancelEditButton (event) {
-  const { role } = event.target.dataset
-
-  if (role == 'cancelEdit') {
-    this.render()
-    this.isEdit = false
-  }
-}
-
-handleFormEditSubmit (event) {
-  event.preventDefault()
-  const { target } = event
-  const { role, id } = target.dataset
-
-  if (role == 'editForm') {
-    const content = target.querySelector('[name="content"]').value
-    console.log(content)
-    this.currentEditedToDo.content = content
-    console.log(this.currentEditedToDo)
 
     this.render()
-    this.isEdit = false
   }
-}
 
-handleRenderNeed () {
-  this.render()
-}
-createToDoTemlate({ id, content, isChecked }) {
-  const checkedAttr = isChecked ? 'checked' : ''
+  handleBeforeUnload() {
+    const json = JSON.stringify(data)
+    localStorage.setItem('data', json)
+  }
 
-  const template = `
+  handleDOMReady() {
+    const dataFromStorage = localStorage.getItem('data')
+
+    if (dataFromStorage) {
+      data = JSON.parse(dataFromStorage)
+
+      this.render()
+    }
+  }
+
+  handleClickRemoveButton(event) {
+
+    const role = event.target.getAttribute('data-role')
+    const id = event.target.getAttribute('data-id')
+
+    if (role == 'remove') {
+      data = data.filter((item) => {
+
+        return item.id != id
+      })
+
+      this.render()
+    }
+  }
+
+  handleClickEditButton(event) {
+    const { target } = event
+    const { role, id } = target.dataset
+
+    if (role == 'edit') {
+      if (this.isEdit == true) {
+        alert('Уже редактируется')
+        return
+      }
+
+      data.forEach((item) => {
+        if (item.id == id) {
+          this.currentEditedToDo = item
+          const { parentElement } = target
+          const formEditElement = this.formEditTemplate(item)
+
+          parentElement.outerHTML = formEditElement
+          this.isEdit = true
+        }
+      })
+    }
+  }
+
+  handleClickCancelEditButton(event) {
+    const { role } = event.target.dataset
+
+    if (role == 'cancelEdit') {
+      this.render()
+      this.isEdit = false
+    }
+  }
+
+  handleFormEditSubmit(event) {
+    event.preventDefault()
+    const { target } = event
+    const { role, id } = target.dataset
+
+    if (role == 'editForm') {
+      const content = target.querySelector('[name="content"]').value
+      console.log(content)
+      this.currentEditedToDo.content = content
+      console.log(this.currentEditedToDo)
+
+      this.render()
+      this.isEdit = false
+    }
+  }
+
+  handleRenderNeed() {
+    this.render()
+  }
+  createToDoTemlate({ id, content, isChecked }) {
+    const checkedAttr = isChecked ? 'checked' : ''
+
+    const template = `
     <div class="island_item d-flex ${checkedAttr}">
         <div class="form-check form-check-lg">
           <input class="form-check-input" ${checkedAttr} type="checkbox" id="${id}" >
@@ -195,13 +200,13 @@ createToDoTemlate({ id, content, isChecked }) {
         
         </div>
         `
-  return template
-}
+    return template
+  }
 
 
-formEditTemplate({ content }) {
+  formEditTemplate({ content }) {
 
-  const template = `
+    const template = `
       <div class="island_item" id="formEditContainer">
         <form class="d-flex" data-role="editForm">
           <div class="flex-grow-1">
@@ -218,23 +223,23 @@ formEditTemplate({ content }) {
         </form>
       </div>
       `
-  return template
-}
+    return template
+  }
 
 
-createToDoElements() {
-  let result = ''
-  data.forEach((toDo) => {
-    result = result + this.createToDoTemlate(toDo)
-  })
-  return result
-}
+  createToDoElements() {
+    let result = ''
+    data.forEach((toDo) => {
+      result = result + this.createToDoTemlate(toDo)
+    })
+    return result
+  }
 
-render() {
-  const toDoElements = this.createToDoElements()
-  listElement.innerHTML = toDoElements
-}
-  
+  render() {
+    const toDoElements = this.createToDoElements()
+    listElement.innerHTML = toDoElements
+  }
+
 }
 
 new TodoFormCreate(formCreateElement)
